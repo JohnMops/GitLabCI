@@ -1,0 +1,36 @@
+stages:
+  - build
+  - test
+
+build website:
+  stage: build
+  image: node # build with docker and use image node
+  script:
+    - npm install
+    - npm install -g gatsby-cli
+    - gatsby build
+  artifacts: # export artifacts on the gitlab ci server for next step
+    paths:
+      - ./public # folder with the files needed to run the server
+
+# Job status codes:
+# 0 - success
+# 1-255 - Error
+
+test artifact:
+  image: alpine
+  stage: test
+  script:
+    - cd ./public
+    - grep -q "Gatsby" index.html
+    - echo $? #check the last return code for the command
+
+test server:
+  image: node
+  stage: test # since both this and the above job are a part of the same stage , they will run in parallel
+  script:
+    - npm install
+    - npm install -g gatsby-cli
+    - gatsby serve # start server using prod build
+    - curl "http://localhost:8000" | grep -q "Gatsby" #check if server is running
+    - echo $?
