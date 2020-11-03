@@ -31,6 +31,7 @@ test server:
   script:
     - npm install
     - npm install -g gatsby-cli
-    - gatsby serve # start server using prod build
-    - curl "http://localhost:8000" | grep -q "Gatsby" #check if server is running
+    - gatsby serve & # start server using prod build in the backround
+    - sleep 3
+    - curl "http://localhost:9000" | grep -q "Gatsby" #check if server is running
     - echo $?
