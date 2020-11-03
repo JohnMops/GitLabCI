@@ -1,6 +1,7 @@
 stages:
   - build
   - test
+  - deploy
 
 build website:
   stage: build
@@ -33,5 +34,16 @@ test server:
     - npm install -g gatsby-cli
     - gatsby serve & # start server using prod build in the backround
     - sleep 3
-    - curl "http://localhost:9000" | grep -q "Gatsby" #check if server is running
+    - curl "http://localhost:9000" | tac | tac | grep -q "Gatsby" #check if server is running
     - echo $?
+
+deploy to EC2:
+  stage: deploy
+  before_script:
+    - mkdir -p ~/.ssh
+    - echo -e "$SSH_KEY" > ~/.ssh/id_rsa # create SSH_KEY var in gitlab and paste private key used for EC2
+    - cat ~/.ssh/id_rsa
+    - chmod 400 ~/.ssh/id_rsa
+    - echo -e "Host *\n\tStringHostKeyChecking no\n\n" > ~/.ssh/config
+  script:
+    - bash .gitlab-deploy.sh
