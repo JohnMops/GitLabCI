@@ -1,0 +1,37 @@
+stages:
+  - build and test
+  - test
+  - deploy
+
+variables:
+  SERVER: 84.111.226.22
+
+build and test:
+  image: docker
+  stage: build and test
+  only:
+    - stage
+  script:
+    - pwd
+    - ls -al
+    - docker build . -t johnmops/golang-server
+    - docker run --name go-server -d -p 80:8080 go-server
+    - sleep 5
+    - curl "http://localhost:80/dog" | grep Dog
+    - docker kill go-server
+    - docker rm go-server
+    - docker login -u johnmops -p $DOCKER_PASS
+    - docker push johnmops/go-server:latest
+  artifacts:
+    paths:
+      - ./
+
+deploy:
+  stage: deploy
+  only:
+    - master
+    - merge_requests
+  when: manual
+  script:
+    - docker run --name go-server -d -p 80:8080 johnmops/go-server:latest
+
