@@ -7,9 +7,11 @@ variables:
   SERVER: 84.111.226.22
   DOCKER_HUB: johnmops/go-server:latest
 
-build and test:
-  image: docker
-  stage: build and test
+# lets use yaml anchors to define a job template for similar jobs
+
+.build_template: &build
+  variables:
+    DOCKER_HUB: $DOCKER_HUB
   only:
     - stage
   script:
@@ -26,6 +28,12 @@ build and test:
   artifacts:
     paths:
       - ./
+
+
+build and test:
+  <<: *build # will merge the build template with this config
+  image: docker
+  stage: build and test
 
 deploy:
   stage: deploy
