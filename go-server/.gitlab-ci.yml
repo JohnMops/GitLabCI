@@ -5,7 +5,7 @@ stages:
 
 variables:
   SERVER: 84.111.226.22
-  DOCKER_HUB: johnmops/go-server:latest
+  DOCKER_HUB: johnmops/go-server
 
 # lets use yaml anchors to define a job template for similar jobs
 
@@ -17,14 +17,14 @@ variables:
   script:
     - pwd
     - ls -al
-    - docker build . -t johnmops/golang-server
+    - docker build . -t johnmops/golang-server:$CI_COMMIT_REF_SLUG
     - docker run --name go-server -d -p 80:8080 go-server
     - sleep 5
     - curl "http://localhost:80/dog" | grep Dog
     - docker kill go-server
     - docker rm go-server
     - docker login -u johnmops -p $DOCKER_PASS
-    - docker push $DOCKER_HUB
+    - docker push $DOCKER_HUB:$CI_COMMIT_REF_SLUG
   artifacts:
     paths:
       - ./
@@ -42,5 +42,5 @@ deploy:
     - merge_requests
   when: manual
   script:
-    - docker run --name go-server -d -p 80:8080 $DOCKER_HUB
+    - docker run --name go-server -d -p 80:8080 $DOCKER_HUB$:$CI_COMMIT_REF_SLUG
 

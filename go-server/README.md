@@ -8,4 +8,4 @@ Sample GO server with GitLabCI config
 - Deploy runs only on a merge request to master
 - Build and test are running against a "stage" branch
 
-This is an example of a GitLabCI with a GO server that i have built.
+This is an example of a GitLabCI with a GO server that I have built.
